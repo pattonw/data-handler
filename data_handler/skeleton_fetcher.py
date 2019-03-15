@@ -154,7 +154,7 @@ class Log:
         )
 
 
-class BoundingBox(NamedTuple):
+class BoundingBox():
     def __init__(self, low: Coord, high: Coord):
         self._low = low
         self._high = high
@@ -178,8 +178,8 @@ class BoundingBox(NamedTuple):
 
 class CatmaidQueryHandler:
     def __init__(self):
-        self._api_key: str = None
-        self._sensitives_file_name: str = None
+        self._api_key = None
+        self._sensitives_file_name = None
         self._catpy_client = None
 
     @property
@@ -289,13 +289,13 @@ class CatmaidQueryHandler:
 
 class SkeletonFetcher:
     def __init__(self):
-        self._roi: BoundingBox = None
+        self._roi = None
 
-        self._all_skeleton_ids: List[int] = None
-        self._reviewed_skeleton_ids: List[int] = None
-        self._large_skeleton_ids: List[int] = None
-        self._split_skeleton_ids: List[int] = None
-        self._catmaid_query_handler: CatmaidQueryHandler = None
+        self._all_skeleton_ids = None
+        self._reviewed_skeleton_ids = None
+        self._large_skeleton_ids = None
+        self._split_skeleton_ids = None
+        self._catmaid_query_handler = None
 
     @property
     def query(self):
