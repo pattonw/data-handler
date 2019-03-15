@@ -16,6 +16,7 @@ reusable datasets
 GOAL: make datasets easily obtainable and replicable
 """
 
+
 class Coord(NamedTuple):
     x: int
     y: int
@@ -85,7 +86,11 @@ class CatmaidQueryHandler:
         if Path(self.sensitives_file).exists():
             return json.load(open(self.sensitives_file, "r"))
         else:
-            return {}
+            raise ValueError(
+                "You must have a sensitives.json file at {}".format(
+                    str(Path(self.sensitives_file).absolute())
+                )
+            )
 
     @property
     def api_key(self) -> str:
@@ -221,7 +226,7 @@ class SkeletonFetcher:
             return pickle.load(open(self.all_skeleton_ids_file, "rb"))
         if self._all_skeleton_ids is None:
             self._all_skeleton_ids = self.query.skeletons_in_roi(self.roi)
-            pickle.dump(self._all_skeleton_ids, open(self.all_skeleton_ids_file, "wb"))
+            # pickle.dump(self._all_skeleton_ids, open(self.all_skeleton_ids_file, "wb"))
         return self._all_skeleton_ids
 
     @property
