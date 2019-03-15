@@ -17,10 +17,35 @@ GOAL: make datasets easily obtainable and replicable
 """
 
 
-class Coord(NamedTuple):
-    x: int
-    y: int
-    z: int
+class Coord:
+    def __init__(self, x: int, y: int, z: int):
+        self._x = x
+        self._y = y
+        self._z = z
+
+    @property
+    def x(self) -> int:
+        return self._x
+
+    @x.setter
+    def x(self, new_x: int):
+        self._x = new_x
+
+    @property
+    def y(self) -> int:
+        return self._y
+
+    @y.setter
+    def y(self, new_y: int):
+        self._x = new_y
+
+    @property
+    def z(self) -> int:
+        return self._z
+
+    @z.setter
+    def z(self, new_z: int):
+        self._z = new_z
 
 
 def _parse_date(date: str):
@@ -34,14 +59,80 @@ def _parse_date(date: str):
         return datetime.datetime.strptime(date, "%Y-%m-%d %H:%M:%S%z")
 
 
-class Log(NamedTuple):
-    user: str
-    operation: str
-    datetimestring: str
-    x: float
-    y: float
-    z: float
-    text: str
+class Log:
+    def __init__(
+        self,
+        user: str,
+        operation: str,
+        datetimestring: str,
+        x: float,
+        y: float,
+        z: float,
+        text: str,
+    ):
+        self._user = user
+        self._operation = operation
+        self._datetimestring = datetimestring
+        self._x = x
+        self._y = y
+        self._z = z
+        self._text = text
+
+    @property
+    def user(self) -> str:
+        return self._user
+
+    @user.setter
+    def user(self, new_user: str):
+        self._user = new_user
+
+    @property
+    def operation(self) -> str:
+        return self._operation
+
+    @operation.setter
+    def operation(self, new_operation: str):
+        self._operation = new_operation
+
+    @property
+    def datetimestring(self) -> str:
+        return self._datetimestring
+
+    @datetimestring.setter
+    def datetimestring(self, new_datetimestring: str):
+        self._datetimestring = new_datetimestring
+
+    @property
+    def x(self) -> float:
+        return self._x
+
+    @x.setter
+    def x(self, new_x: float):
+        self._x = new_x
+
+    @property
+    def y(self) -> float:
+        return self._y
+
+    @y.setter
+    def y(self, new_y: float):
+        self._y = new_y
+
+    @property
+    def z(self) -> float:
+        return self._z
+
+    @z.setter
+    def z(self, new_z: float):
+        self._z = new_z
+
+    @property
+    def text(self) -> str:
+        return self._text
+
+    @text.setter
+    def text(self, new_text: str):
+        self._text = new_text
 
     @property
     def skeleton_id(self) -> int:
@@ -64,8 +155,25 @@ class Log(NamedTuple):
 
 
 class BoundingBox(NamedTuple):
-    min: Coord
-    max: Coord
+    def __init__(self, low: Coord, high: Coord):
+        self._low = low
+        self._high = high
+
+    @property
+    def low(self) -> Coord:
+        return self._low
+
+    @low.setter
+    def low(self, new_low: Coord):
+        self._low = new_low
+
+    @property
+    def high(self) -> Coord:
+        return self._high
+
+    @high.setter
+    def high(self, new_high: Coord):
+        self._high = new_high
 
 
 class CatmaidQueryHandler:
@@ -106,12 +214,12 @@ class CatmaidQueryHandler:
 
     def skeletons_in_roi(self, roi: BoundingBox):
         params = {
-            "minx": roi.min.x,
-            "maxx": roi.max.x,
-            "miny": roi.min.y,
-            "maxy": roi.max.y,
-            "minz": roi.min.z,
-            "maxz": roi.max.z,
+            "minx": roi.low.x,
+            "maxx": roi.high.x,
+            "miny": roi.low.y,
+            "maxy": roi.high.y,
+            "minz": roi.low.z,
+            "maxz": roi.high.z,
         }
         return self.catpy_client.get(["1", "skeletons", "in-bounding-box"], params)
 
