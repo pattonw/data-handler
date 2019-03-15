@@ -1,0 +1,9 @@
+# Arbor-segmentation combo
+git+git://github.com/pattonw/sarbor@master
+
+# Accessing Jans segmentations
+git+git://github.com/funkelab/daisy@master
+git+git://github.com/funkelab/lsd@master
+git+git://github.com/funkey/gunpowder@release-v1.0
+git+git://github.com/funkelab/funlib.segment@master
+git+git://github.com/funkey/waterz@master
