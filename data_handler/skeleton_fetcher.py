@@ -6,7 +6,7 @@ import pickle
 from pathlib import Path
 import datetime
 
-from ffskel.Skeletons.skeletons import Skeleton
+from sarbor.skeletons import Skeleton
 
 """
 A script to gather data.

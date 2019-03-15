@@ -11,7 +11,7 @@ import lsd
 import funlib.segment
 
 
-from ffskel.Skeletons import Skeleton
+from sarbor import Skeleton
 
 import json
 import time

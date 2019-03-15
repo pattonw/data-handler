@@ -6,7 +6,7 @@ import seaborn as sns
 from typing import List
 import pickle
 
-from skeleton_fetcher import SkeletonFetcher
+from .skeleton_fetcher import SkeletonFetcher
 
 """
 This script is supposed to be a location to gather visualization scripts
@@ -41,34 +41,35 @@ def load_data():
             )
     return data
 
+def run():
 
-data = pd.DataFrame(
-    load_data(),
-    columns=[
-        "skid",
-        "keep_nid",
-        "drop_nid",
-        "smoothed_rank",
-        "unsmoothed_rank",
-        "max_strahler",
-        "keep_strahler",
-        "drop_strahler",
-    ],
-)
-data["num_nodes"] = data["smoothed_rank"].map(lambda x: x[1])
-data["smoothed_rank"] = data["smoothed_rank"].map(lambda x: x[0])
-data["unsmoothed_rank"] = data["unsmoothed_rank"].map(lambda x: x[0])
-data["smooth_score"] = (data["smoothed_rank"] + 1) / data["num_nodes"]
-data["unsmooth_score"] = (data["unsmoothed_rank"] + 1) / data["num_nodes"]
+    data = pd.DataFrame(
+        load_data(),
+        columns=[
+            "skid",
+            "keep_nid",
+            "drop_nid",
+            "smoothed_rank",
+            "unsmoothed_rank",
+            "max_strahler",
+            "keep_strahler",
+            "drop_strahler",
+        ],
+    )
+    data["num_nodes"] = data["smoothed_rank"].map(lambda x: x[1])
+    data["smoothed_rank"] = data["smoothed_rank"].map(lambda x: x[0])
+    data["unsmoothed_rank"] = data["unsmoothed_rank"].map(lambda x: x[0])
+    data["smooth_score"] = (data["smoothed_rank"] + 1) / data["num_nodes"]
+    data["unsmooth_score"] = (data["unsmoothed_rank"] + 1) / data["num_nodes"]
 
-data.hist(column="smooth_score")
-plt.show()
-data.hist(column="unsmooth_score")
-plt.show()
+    data.hist(column="smooth_score")
+    plt.show()
+    data.hist(column="unsmooth_score")
+    plt.show()
 
-print(data.groupby(by=["skid"]).agg({"unsmooth_score": ["mean", "std"]}))
+    print(data.groupby(by=["skid"]).agg({"unsmooth_score": ["mean", "std"]}))
 
-print(data.head())
+    print(data.head())
 
 
 class SkeletonDataPlotter:
