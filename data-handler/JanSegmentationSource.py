@@ -247,7 +247,7 @@ class JanSegmentationSource:
         edge_dict[b] = None
         edge_dict[a] = b
         while len(unseen_edges) > 0:
-            temp = set()
+            data-handler = set()
             for a, b in unseen_edges:
                 if b in edge_dict and a not in edge_dict:
                     edge_dict[a] = b
@@ -256,14 +256,14 @@ class JanSegmentationSource:
                 elif a in edge_dict and b in edge_dict:
                     pass
                 else:
-                    temp.add((a, b))
-            if len(temp) == len(unseen_edges):
+                    data-handler.add((a, b))
+            if len(data-handler) == len(unseen_edges):
                 edge_dicts.append({})
                 edge_dict = edge_dicts[-1]
-                a, b = temp.pop()
+                a, b = data-handler.pop()
                 edge_dict[b] = None
                 edge_dict[a] = b
-            unseen_edges = temp
+            unseen_edges = data-handler
 
         if len(edge_dicts) > 1:
             sizes = [len(x) for x in edge_dicts]

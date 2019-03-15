@@ -1,4 +1,4 @@
-Welcome to Temp's documentation!
+Welcome to data_handler's documentation!
 ======================================
 
 .. toctree::

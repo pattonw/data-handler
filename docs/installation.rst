@@ -8,13 +8,13 @@ Installation
 Stable release
 --------------
 
-To install Temp, run this command in your terminal:
+To install data_handler, run this command in your terminal:
 
 .. code-block:: console
 
-    $ pip install temp
+    $ pip install data-handler
 
-This is the preferred method to install Temp, as it will always install the most recent stable release.
+This is the preferred method to install data_handler, as it will always install the most recent stable release.
 
 If you don't have `pip`_ installed, this `Python installation guide`_ can guide
 you through the process.
@@ -26,19 +26,19 @@ you through the process.
 From sources
 ------------
 
-The sources for Temp can be downloaded from the `Github repo`_.
+The sources for data_handler can be downloaded from the `Github repo`_.
 
 You can either clone the public repository:
 
 .. code-block:: console
 
-    $ git clone git://github.com/pattonw/temp
+    $ git clone git://github.com/pattonw/data-handler
 
 Or download the `tarball`_:
 
 .. code-block:: console
 
-    $ curl  -OL https://github.com/pattonw/temp/tarball/master
+    $ curl  -OL https://github.com/pattonw/data-handler/tarball/master
 
 Once you have a copy of the source, you can install it with:
 
@@ -47,5 +47,5 @@ Once you have a copy of the source, you can install it with:
     $ python setup.py install
 
 
-.. _Github repo: https://github.com/pattonw/temp
-.. _tarball: https://github.com/pattonw/temp/tarball/master
+.. _Github repo: https://github.com/pattonw/data-handler
+.. _tarball: https://github.com/pattonw/data-handler/tarball/master

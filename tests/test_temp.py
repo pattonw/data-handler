@@ -1,16 +1,16 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-"""Tests for `temp` package."""
+"""Tests for `data-handler` package."""
 
 
 import unittest
 
-from temp import temp
+from data-handler import data-handler
 
 
 class TestTemp(unittest.TestCase):
-    """Tests for `temp` package."""
+    """Tests for `data-handler` package."""
 
     def setUp(self):
         """Set up test fixtures, if any."""

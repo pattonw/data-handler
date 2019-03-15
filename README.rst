@@ -1,16 +1,16 @@
 ====
-Temp
+data_handler
 ====
 
 
-.. image:: https://img.shields.io/pypi/v/temp.svg
-        :target: https://pypi.python.org/pypi/temp
+.. image:: https://img.shields.io/pypi/v/data-handler.svg
+        :target: https://pypi.python.org/pypi/data-handler
 
-.. image:: https://img.shields.io/travis/pattonw/temp.svg
-        :target: https://travis-ci.org/pattonw/temp
+.. image:: https://img.shields.io/travis/pattonw/data-handler.svg
+        :target: https://travis-ci.org/pattonw/data-handler
 
-.. image:: https://readthedocs.org/projects/temp/badge/?version=latest
-        :target: https://temp.readthedocs.io/en/latest/?badge=latest
+.. image:: https://readthedocs.org/projects/data-handler/badge/?version=latest
+        :target: https://data-handler.readthedocs.io/en/latest/?badge=latest
         :alt: Documentation Status
 
 
@@ -20,7 +20,7 @@ Package containing scripts tying sarbor to diluvian and other segmentation sourc
 
 
 * Free software: MIT license
-* Documentation: https://temp.readthedocs.io.
+* Documentation: https://data-handler.readthedocs.io.
 
 
 Features

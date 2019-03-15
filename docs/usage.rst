@@ -2,6 +2,6 @@
 Usage
 =====
 
-To use Temp in a project::
+To use data_handler in a project::
 
-    import temp
+    import data-handler
