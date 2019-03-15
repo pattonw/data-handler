@@ -8,6 +8,10 @@ import pickle
 
 from skeleton_fetcher import SkeletonFetcher
 
+"""
+This script is supposed to be a location to gather visualization scripts
+"""
+
 
 def strahler_info(nid_pid_x_y_z_s, branch_point, chop_point):
     nid_pid_x_y_z_s = sorted(nid_pid_x_y_z_s, key=lambda x: x[5], reverse=True)

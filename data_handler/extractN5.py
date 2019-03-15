@@ -7,6 +7,12 @@ import pickle
 
 from JanSegmentationSource import JanSegmentationSource
 
+"""
+A spinoff of the RunMissingBranchTest.py script.
+This script only runs one skeleton, and stores the segmentation data
+in an n5 data, as well as the ranking data.
+"""
+
 
 def rank_from_map(sub_nid_com_map, key):
     ranking = sorted(

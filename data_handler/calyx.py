@@ -1,11 +1,17 @@
 from typing import List, Dict, Tuple
 import numpy as np
 
-import json
-
 Point3 = Tuple[int, int, int]
 BoundBox = List[slice]
 NodeData = Dict[Point3, Tuple[np.ndarray, BoundBox]]
+
+"""
+This class contains information about the Calyx volume used by the
+futusa group
+
+TODO: Add a sensitives file that keeps track of the file location
+since that is also CALYX specific
+"""
 
 
 class BoundingBox:

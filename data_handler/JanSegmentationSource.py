@@ -141,11 +141,7 @@ class JanSegmentationSource:
 
     @property
     def bounding_box(self) -> BoundingBox:
-        """
-        Bounding box of the segmented region
-        default: BoundingBox(start, shape)
-        """
-        return BoundingBox(self.start, shape=self.shape)
+        self.volume.bounding_box
 
     @property
     def fragments_file(self):

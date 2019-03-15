@@ -12,6 +12,10 @@ from ffskel.Skeletons.skeletons import Skeleton
 
 logging.getLogger().setLevel(logging.INFO)
 
+"""
+This script runs a single skeleton through JanSegmentation
+"""
+
 
 def rank_from_map(sub_nid_com_map, key):
     ranking = sorted(

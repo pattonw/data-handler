@@ -8,6 +8,13 @@ import datetime
 
 from ffskel.Skeletons.skeletons import Skeleton
 
+"""
+A script to gather data.
+handles fetching from catmaid and compiling skeletons into
+reusable datasets
+
+GOAL: make datasets easily obtainable and replicable
+"""
 
 class Coord(NamedTuple):
     x: int

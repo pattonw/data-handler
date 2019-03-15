@@ -7,6 +7,10 @@ import pickle
 
 from JanSegmentationSource import JanSegmentationSource
 
+"""
+Runs the false merge dataset through Jans segmentation.
+"""
+
 
 def rank_from_map(connectivity_map, location):
     closest_pair = None
