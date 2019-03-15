@@ -1,3 +1,3 @@
 # -*- coding: utf-8 -*-
 
-"""Unit test package for data-handler."""
+"""Unit test package for data_handler."""

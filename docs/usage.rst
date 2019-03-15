@@ -4,4 +4,4 @@ Usage
 
 To use data_handler in a project::
 
-    import data-handler
+    import data_handler

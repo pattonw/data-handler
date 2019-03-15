@@ -25,5 +25,5 @@ deploy:
     secure: PLEASE_REPLACE_ME
   on:
     tags: true
-    repo: pattonw/data-handler
+    repo: pattonw/data_handler
     python: 3.6

@@ -18,37 +18,25 @@ import time
 
 from multiprocessing import Process, Manager, Value
 
+from .calyx import Calyx, BoundingBox
+
 Point3 = Tuple[int, int, int]
 BoundBox = List[slice]
 NodeData = Dict[Point3, Tuple[np.ndarray, BoundBox]]
 
 
-class BoundingBox:
-    def __init__(
-        self, start: np.ndarray, end: np.ndarray = None, shape: np.ndarray = None
-    ):
-        if end is None and shape is None:
-            raise ValueError("Shape or End must be given!")
-        self.start = start
-        self.end = end or start + shape
-
-    def contains_point(self, point: np.ndarray) -> bool:
-        return all(self.start <= point) and all(self.end > point)
-
-    def contains_point_with_radius(self, point: np.ndarray, radius: np.ndarray) -> bool:
-        return self.contains_point(point - radius) and self.contains_point(
-            point + radius
-        )
-
-    def contains_roi(self, start: np.ndarray, shape: np.ndarray):
-        return self.contains_point(start) and self.contains_point(start + shape)
-
-    def __str__(self):
-        return "{} - {}".format(self.start, self.end)
-
-
 class JanSegmentationSource:
-    def __init__(self, constants: Dict = {}, sensitives_file: str = "sensitives.json"):
+    def __init__(
+        self,
+        constants: Dict = {},
+        sensitives_file: str = "sensitives.json",
+        volume=None,
+    ):
+        if volume is None:
+            self.volume = Calyx
+        else:
+            self.volume = volume
+
         self.constants = constants
 
         self.sensitives = json.load(open(sensitives_file, "r"))
@@ -85,35 +73,19 @@ class JanSegmentationSource:
 
     @property
     def start(self) -> np.ndarray:
-        """
-        Coordinates in X,Y,Z order with units in nano-meters
-        default: 403560, 121800, 158000
-        """
-        return self.constants.get("start", np.array([403560, 121800, 158000]))
+        return self.volume.start
 
     @property
     def shape(self) -> np.ndarray:
-        """
-        Shape in X,Y,Z order with units in nano-meters
-        default: 64000, 52000, 76000
-        """
-        return self.constants.get("shape", np.array([64000, 52000, 76000]))
+        return self.volume.shape
 
     @property
     def end(self) -> np.ndarray:
-        """
-        Coordinates in X,Y,Z order with units in nano-meters
-        default: start + shape
-        """
-        return self.start + self.shape
+        return self.volume.end
 
     @property
     def resolution(self) -> np.ndarray:
-        """
-        Resolution in X,Y,Z order with units in nano-meters per voxel on each axis
-        default: 4x4x40nm
-        """
-        return self.constants.get("resolution", np.array([4, 4, 40]))
+        return self.volume.resolution
 
     @property
     def view_radius(self) -> int:
@@ -247,7 +219,7 @@ class JanSegmentationSource:
         edge_dict[b] = None
         edge_dict[a] = b
         while len(unseen_edges) > 0:
-            data-handler = set()
+            temp = set()
             for a, b in unseen_edges:
                 if b in edge_dict and a not in edge_dict:
                     edge_dict[a] = b
@@ -256,14 +228,14 @@ class JanSegmentationSource:
                 elif a in edge_dict and b in edge_dict:
                     pass
                 else:
-                    data-handler.add((a, b))
-            if len(data-handler) == len(unseen_edges):
+                    temp.add((a, b))
+            if len(temp) == len(unseen_edges):
                 edge_dicts.append({})
                 edge_dict = edge_dicts[-1]
-                a, b = data-handler.pop()
+                a, b = temp.pop()
                 edge_dict[b] = None
                 edge_dict[a] = b
-            unseen_edges = data-handler
+            unseen_edges = temp
 
         if len(edge_dicts) > 1:
             sizes = [len(x) for x in edge_dicts]
