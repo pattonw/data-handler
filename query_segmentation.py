@@ -1,5 +1,5 @@
 import sys
-from .JanSegmentationSource import JanSegmentationSource
+from data_handler.JanSegmentationSource import JanSegmentationSource
 from sarbor import Skeleton
 import numpy as np
 import logging
