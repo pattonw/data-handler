@@ -246,9 +246,9 @@ class JanSegmentationSource:
                 # segmented volume bounds
                 logging.debug("Node failed! {}".format(e))
                 pass
-            except Exception as e:
-                logging.warn("Unknown Error: {}".format(e))
-                pass
+            #except Exception as e:
+            #    logging.warn("Unknown Error: {}".format(e))
+            #    pass
 
     def query_local_segmentation(self, roi, threshold):
         # open fragments
