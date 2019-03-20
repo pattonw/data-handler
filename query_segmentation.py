@@ -13,7 +13,7 @@ def seeds_from_skeleton(filename):
     with open(filename, newline="") as csvfile:
         reader = csv.reader(csvfile, delimiter=",", quotechar="|")
         for row in reader:
-            coords.append([int(float(x)) for x in row[2:]])
+            coords.append([int(float(x)) for x in row[2::-1]])
             if row[1].strip() == "null" or row[1].strip() == "none":
                 ids.append([int(float(row[0])), None])
             elif row[0] == row[1]:
