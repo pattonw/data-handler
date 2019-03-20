@@ -33,7 +33,7 @@ class JanSegmentationSource:
         volume=None,
     ):
         if volume is None:
-            self.volume = Calyx
+            self.volume = Calyx()
         else:
             self.volume = volume
 
