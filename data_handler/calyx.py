@@ -1,5 +1,9 @@
 from typing import List, Dict, Tuple
 import numpy as np
+import pickle
+from pathlib import Path
+
+from sarbor import Skeleton
 
 Point3 = Tuple[int, int, int]
 BoundBox = List[slice]
@@ -92,3 +96,57 @@ class Calyx:
         default: BoundingBox(start, shape)
         """
         return BoundingBox(self.start, shape=self.shape)
+
+    @property
+    def missing_branch_file(self):
+        return Path(
+            self.constants.get(
+                "missing_branch_file",
+                "/".join(("datasets", "missing_branch_dataset.obj")),
+            )
+        )
+
+    @property
+    def missing_branches(self):
+        dataset = pickle.load(self.missing_branch_file.open("rb"))
+        for skid, data in dataset.items():
+            skeleton = Skeleton()
+            new = True
+            skeleton.input_nid_pid_x_y_z_strahler(data["skeleton_nodes"])
+            for branch_chop in data["removed_branch_nodes"]:
+                yield (
+                    skid,
+                    skeleton,
+                    skeleton.delete_branch(branch_chop),
+                    "branch_chop",
+                    branch_chop,
+                    new,
+                )
+                new = False
+            for segment_chop in data["removed_segment_nodes"]:
+                yield (
+                    skid,
+                    skeleton,
+                    skeleton.delete_branch(segment_chop),
+                    "segment_chop",
+                    segment_chop,
+                    new,
+                )
+                new = False
+
+    @property
+    def false_merge_file(self):
+        return Path(
+            self.constants.get(
+                "false_merge_file", "/".join(("datasets", "false_merge_dataset.obj"))
+            )
+        )
+
+    @property
+    def false_merges(self):
+        dataset = pickle.load(self.false_merge_file.open("rb"))
+        for skid, data in dataset.items():
+            log = data["split_log"]
+            skeleton = Skeleton()
+            skeleton.input_nid_pid_x_y_z(data["skeleton_nodes"])
+            yield (skid, skeleton, log)
