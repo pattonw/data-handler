@@ -20,6 +20,7 @@ pyn5==0.1.0
 scikit-image==0.14.2
 Cython==0.29.6
 mahotas==1.4.5
+zarr==2.2.0
 
 # data vis
 matplotlib==3.0.3

@@ -4,6 +4,8 @@ from sarbor import Skeleton
 import numpy as np
 import logging
 
+logging.basicConfig(level=logging.info)
+
 
 def seeds_from_skeleton(filename):
     import csv
@@ -13,7 +15,7 @@ def seeds_from_skeleton(filename):
     with open(filename, newline="") as csvfile:
         reader = csv.reader(csvfile, delimiter=",", quotechar="|")
         for row in reader:
-            coords.append([int(float(x)) for x in row[2::-1]])
+            coords.append([int(float(x)) for x in row[2:][::-1]])
             if row[1].strip() == "null" or row[1].strip() == "none":
                 ids.append([int(float(row[0])), None])
             elif row[0] == row[1]:
@@ -26,6 +28,14 @@ def seeds_from_skeleton(filename):
 _, skeleton_file, output_file_base, job_config = sys.argv
 
 skel = Skeleton()
+constants = {
+    "original_resolution": np.array([4, 4, 40]),
+    "start_phys": np.array([0, 0, 0]),
+    "shape_phys": np.array([253952 * 4, 155648 * 4, 7063 * 40]),
+    "downsample_scale": np.array([10, 10, 1])[::-1],
+    "leaf_voxel_shape": np.array([128, 128, 128])[::-1],
+}
+skel.seg._constants = constants
 
 nodes = seeds_from_skeleton(skeleton_file)
 skel.input_nid_pid_x_y_z(nodes)
@@ -33,7 +43,7 @@ skel.input_nid_pid_x_y_z(nodes)
 jans_segmentations = JanSegmentationSource()
 
 
-jans_segmentations.segment_skeleton(skel)
+jans_segmentations.segment_skeleton(skel, num_processes=32)
 for node in skel.get_nodes():
     try:
         data, bounds = jans_segmentations[tuple(node.value.center)]
