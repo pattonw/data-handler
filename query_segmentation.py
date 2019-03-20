@@ -48,6 +48,7 @@ for node in skel.get_nodes():
     try:
         data, bounds = jans_segmentations[tuple(node.value.center)]
         skel.fill(node.key, (data > 127).astype(np.uint8))
+        logging.info("Node {} had data with max value {}!".format(node.key, data.max()))
     except KeyError:
         logging.info("No data for node {}!".format(node.key))
     except TypeError:
