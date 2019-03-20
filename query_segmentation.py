@@ -4,7 +4,7 @@ from sarbor import Skeleton
 import numpy as np
 import logging
 
-logging.basicConfig(level=logging.info)
+logging.basicConfig(level=logging.INFO)
 
 
 def seeds_from_skeleton(filename):
@@ -32,8 +32,8 @@ constants = {
     "original_resolution": np.array([4, 4, 40]),
     "start_phys": np.array([0, 0, 0]),
     "shape_phys": np.array([253952 * 4, 155648 * 4, 7063 * 40]),
-    "downsample_scale": np.array([10, 10, 1])[::-1],
-    "leaf_voxel_shape": np.array([128, 128, 128])[::-1],
+    "downsample_scale": np.array([10, 10, 1]),
+    "leaf_voxel_shape": np.array([128, 128, 128]),
 }
 skel.seg._constants = constants
 
