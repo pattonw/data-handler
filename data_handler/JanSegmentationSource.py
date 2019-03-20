@@ -141,7 +141,7 @@ class JanSegmentationSource:
 
     @property
     def bounding_box(self) -> BoundingBox:
-        self.volume.bounding_box
+        return self.volume.bounding_box
 
     @property
     def fragments_file(self):
