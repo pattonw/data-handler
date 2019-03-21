@@ -104,7 +104,7 @@ class JanSegmentationSource:
         """
         Shape of a field of view around each node during segmentation in X,Y,Z order
         """
-        shape = self._constants.get("fov_voxel_shape", np.array([31, 31, 31]))
+        shape = self.constants.get("fov_voxel_shape", np.array([31, 31, 31]))
         if any(shape % 2 == np.array([0, 0, 0])):
             raise ValueError(
                 "Even fov_shapes are not supported yet since ",
