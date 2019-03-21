@@ -42,6 +42,9 @@ skel.input_nid_pid_x_y_z(nodes)
 
 jans_segmentations = JanSegmentationSource()
 
+jans_segmentations._constants["fov_shape_voxels"] = np.array([45, 45, 45])
+skel.seg._constants["fov_shape_voxels"] = np.array([45, 45, 45])
+
 
 jans_segmentations.segment_skeleton(skel, num_processes=32)
 for node in skel.get_nodes():

@@ -73,7 +73,7 @@ def run():
         # gather segmentations
 
         sampled_tree = unsampled_tree.resample_segments(
-            jans_segmentations.sampling_dist, 1000, 0.01
+            900, 1000, 0.01
         )
 
         jans_segmentations.segment_skeleton(sampled_tree, 64)

@@ -88,20 +88,6 @@ class JanSegmentationSource:
         return self.volume.resolution
 
     @property
-    def view_radius(self) -> int:
-        """
-        Radius of viewing with units in nano-meters per voxel
-        default: 600nm
-        """
-        return self.constants.get("view_radius", 600)
-
-    @property
-    def sampling_dist(self) -> int:
-        return self.constants.get(
-            "sampling_dist", self.view_radius // 2 * 3
-        )  # Default: Approx 50% of voxels will be in two fovs
-
-    @property
     def scale(self) -> np.ndarray:
         return self.constants.get("scale", np.array([10, 10, 1]))
 
@@ -114,13 +100,21 @@ class JanSegmentationSource:
         return self.scale * self.resolution
 
     @property
+    def fov_shape_voxels(self) -> np.ndarray:
+        """
+        Shape of a field of view around each node during segmentation in X,Y,Z order
+        """
+        shape = self._constants.get("fov_voxel_shape", np.array([31, 31, 31]))
+        if any(shape % 2 == np.array([0, 0, 0])):
+            raise ValueError(
+                "Even fov_shapes are not supported yet since ",
+                "there would be no 'middle' voxel for the sample point",
+            )
+        return shape
+
+    @property
     def fov_shape(self) -> np.ndarray:
-        """
-        Shape of the field of view.
-        """
-        num_blocks = (2 * self.view_radius) // self.voxel_shape
-        num_blocks += (num_blocks + 1) % 2
-        return num_blocks * self.voxel_shape
+        self.fov_shape_voxels * self.voxel_shape
 
     def _get_roi(self, center: np.ndarray) -> Tuple:
         """
@@ -246,7 +240,7 @@ class JanSegmentationSource:
                 # segmented volume bounds
                 logging.debug("Node failed! {}".format(e))
                 pass
-            #except Exception as e:
+            # except Exception as e:
             #    logging.warn("Unknown Error: {}".format(e))
             #    pass
 

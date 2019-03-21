@@ -23,6 +23,7 @@ def rank_from_map(sub_nid_com_map, key):
     )
     return [x[0] for x in ranking].index(key), len(ranking)
 
+
 def run():
 
     done_skele_file = Path("done_skeles_dict.obj")
@@ -75,10 +76,8 @@ def run():
 
     print("Testing skeleton {} with {} - {}".format(skid, chop_type, chop))
 
-
     def _data_populator(bounds):
         return np.zeros(np.array(bounds[1]) - np.array(bounds[0]))
-
 
     sampled_tree_mask = OctreeVolume(
         [50, 50, 50],
@@ -104,11 +103,11 @@ def run():
             jans_segmentations.end - jans_segmentations.fov_shape // 2 - 1,
         )
     )
-    print("{} nodes filtered out of skeleton {}!".format(num_filtered, chopped_skeleton))
-
-    sampled_tree = unsampled_tree.resample_segments(
-        jans_segmentations.sampling_dist, 1000, 0.01
+    print(
+        "{} nodes filtered out of skeleton {}!".format(num_filtered, chopped_skeleton)
     )
+
+    sampled_tree = unsampled_tree.resample_segments(900, 1000, 0.01)
     if save_data[0][-1] is not None:
         jans_segmentations._node_segmentations = save_data[0][-1]
     jans_segmentations.segment_skeleton(sampled_tree)

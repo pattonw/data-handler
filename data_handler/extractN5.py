@@ -74,7 +74,7 @@ def run():
             filtered_out = True
 
         sampled_tree = unsampled_tree.resample_segments(
-            jans_segmentations.sampling_dist, 1000, 0.01
+            900, 1000, 0.01
         )
         if len(sampled_tree.get_nodes()) < 600:
             continue
