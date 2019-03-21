@@ -114,7 +114,7 @@ class JanSegmentationSource:
 
     @property
     def fov_shape(self) -> np.ndarray:
-        self.fov_shape_voxels * self.voxel_shape
+        return self.fov_shape_voxels * self.voxel_shape
 
     def _get_roi(self, center: np.ndarray) -> Tuple:
         """
