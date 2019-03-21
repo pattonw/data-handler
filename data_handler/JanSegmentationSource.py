@@ -4,6 +4,7 @@ import queue
 import pickle
 import logging
 from pathlib import Path
+from pymongo.errors import OperationFailure
 
 
 import daisy
@@ -240,6 +241,8 @@ class JanSegmentationSource:
                 # segmented volume bounds
                 logging.debug("Node failed! {}".format(e))
                 pass
+            except OperationFailure as e:
+                logging.warn(e)
             # except Exception as e:
             #    logging.warn("Unknown Error: {}".format(e))
             #    pass
