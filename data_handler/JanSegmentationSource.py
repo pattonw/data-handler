@@ -137,19 +137,19 @@ class JanSegmentationSource:
 
     @property
     def missing_branch_file(self):
-        self.volume.missing_branch_file
+        return self.volume.missing_branch_file
 
     @property
     def missing_branches(self):
-        self.volume.missing_branches
+        return self.volume.missing_branches
 
     @property
     def false_merge_file(self):
-        self.volume.false_merge_file
+        return self.volume.false_merge_file
 
     @property
     def false_merges(self):
-        self.volume.false_merges
+        return self.volume.false_merges
 
     @staticmethod
     def _build_edge_dict(
