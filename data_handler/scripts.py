@@ -9,27 +9,8 @@ from pathlib import Path
 from sarbor import OctreeVolume
 
 
-def query_jans_segmentation():
+def query_jans_segmentation(config):
     logging.basicConfig(level=logging.INFO)
-
-    def seeds_from_skeleton(filename):
-        import csv
-
-        coords = []
-        ids = []
-        with open(filename, newline="") as csvfile:
-            reader = csv.reader(csvfile, delimiter=",", quotechar="|")
-            for row in reader:
-                coords.append([int(float(x)) for x in row[2:]])
-                if row[1].strip() == "null" or row[1].strip() == "none":
-                    ids.append([int(float(row[0])), None])
-                elif row[0] == row[1]:
-                    ids.append([int(float(row[0])), None])
-                else:
-                    ids.append([int(float(x)) for x in row[:2]])
-        return [ids[i] + coords[i] for i in range(len(ids))]
-
-    _, skeleton_file, output_file_base, job_config = sys.argv
 
     skel = Skeleton()
     constants = {
@@ -41,18 +22,15 @@ def query_jans_segmentation():
     }
     skel.seg._constants = constants
 
-    nodes = seeds_from_skeleton(skeleton_file)
+    nodes = config.skeleton.nodes
     skel.input_nid_pid_x_y_z(nodes)
 
-    job_config = json.load(open("job_config.json"))
-
-    if job_config.get("resample", True):
-        skel.resample_segments(job_config["resampling_delta"])
-    if job_config.get("filter_by_strahler", False):
+    if config.skeleton.strahler_filter:
         skel.filter_nodes_by_strahler(
-            job_config.get("strahler_filter_min", 0),
-            job_config.get("strahler_filter_max", 10),
+            config.skeleton.min_strahler, config.skeleton.max_strahler
         )
+    if config.skeleton.resample:
+        skel.resample_segments(config.skeleton.resample_delta)
 
     jans_segmentations = JanSegmentationSource()
 
