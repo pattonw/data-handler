@@ -19,6 +19,7 @@ def query_jans_segmentation(config, output_file_base):
         "shape_phys": np.array([253952 * 4, 155648 * 4, 7063 * 40]),
         "downsample_scale": np.array([10, 10, 1]),
         "leaf_voxel_shape": np.array([128, 128, 128]),
+        "fov_shape_voxels": np.array([45, 45, 45]),
     }
     skel.seg._constants = constants
 
@@ -35,11 +36,11 @@ def query_jans_segmentation(config, output_file_base):
         )
     else:
         processed_skel = skel
+    processed_skel.seg._constants = skel.seg._constants
 
     jans_segmentations = JanSegmentationSource()
 
     jans_segmentations.constants["fov_shape_voxels"] = np.array([45, 45, 45])
-    processed_skel.seg._constants["fov_shape_voxels"] = np.array([45, 45, 45])
 
     jans_segmentations.segment_skeleton(processed_skel, num_processes=32)
     for node in processed_skel.get_nodes():
