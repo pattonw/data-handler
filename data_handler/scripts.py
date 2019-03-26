@@ -25,23 +25,27 @@ def query_jans_segmentation(config, output_file_base):
     nodes = config.skeleton.nodes
     skel.input_nid_pid_x_y_z(nodes)
 
-    if config.skeleton.strahler_filter:
+    if config.skeleton.strahler_filter and False:
         skel.filter_nodes_by_strahler(
             config.skeleton.min_strahler, config.skeleton.max_strahler
         )
     if config.skeleton.resample:
-        skel.resample_segments(config.skeleton.resample_delta)
+        processed_skel = skel.resample_segments(
+            config.skeleton.resample_delta, 1000, 0.1
+        )
+    else:
+        processed_skel = skel
 
     jans_segmentations = JanSegmentationSource()
 
     jans_segmentations.constants["fov_shape_voxels"] = np.array([45, 45, 45])
-    skel.seg._constants["fov_shape_voxels"] = np.array([45, 45, 45])
+    processed_skel.seg._constants["fov_shape_voxels"] = np.array([45, 45, 45])
 
-    jans_segmentations.segment_skeleton(skel, num_processes=32)
-    for node in skel.get_nodes():
+    jans_segmentations.segment_skeleton(processed_skel, num_processes=32)
+    for node in processed_skel.get_nodes():
         try:
             data, bounds = jans_segmentations[tuple(node.value.center)]
-            skel.fill(node.key, (data > 127).astype(np.uint8))
+            processed_skel.fill(node.key, (data > 127).astype(np.uint8))
             logging.info(
                 "Node {} had data with max value {}!".format(node.key, data.max())
             )
@@ -50,7 +54,7 @@ def query_jans_segmentation(config, output_file_base):
         except TypeError:
             logging.info("Node {} data was None".format(node.value.center))
 
-    skel.save_data_for_CATMAID(output_file_base)
+    processed_skel.save_data_for_CATMAID(output_file_base)
 
 
 """
