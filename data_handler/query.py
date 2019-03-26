@@ -19,7 +19,6 @@ def cli(config: Config, skeleton_csv, skeleton_config):
 @click.option("--output_file", default="-", type=click.Path(), help="output file base")
 @pass_config
 def query_jans_segmentation(config, output_file):
-    return None
     from .scripts import query_jans_segmentation
 
     query_jans_segmentation(config, output_file)
