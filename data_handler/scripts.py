@@ -148,10 +148,12 @@ def run_simple_test():
         )
     )
     print(
-        "{} nodes filtered out of skeleton {}!".format(num_filtered, chopped_skeleton)
+        "{} nodes filtered out of skeleton {}!\n{} nodes remaining!".format(
+            num_filtered, skid, len(list(unsampled_tree.get_nodes()))
+        )
     )
 
-    sampled_tree = unsampled_tree.resample_segments(900, 1000, 0.01)
+    sampled_tree = unsampled_tree.resample_segments(900, 1000, 0.0001)
     if save_data[0][-1] is not None:
         jans_segmentations._node_segmentations = save_data[0][-1]
     jans_segmentations.segment_skeleton(sampled_tree)
@@ -310,9 +312,9 @@ def run_missing_branch_test():
         remaining_nodes = [node.key for node in chopped.get_nodes()]
         assert chop[0] in remaining_nodes and not chop[1] in remaining_nodes
 
-    logging.basicConfig(level=logging.INFO, filename="results/missing_branches.log")
+    logging.basicConfig(level=logging.INFO, filename="test_results/missing_branches.log")
 
-    done_skele_file = Path("results/done_skeles_dict.obj")
+    done_skele_file = Path("test_results/done_skeles_dict.obj")
     jans_segmentations = JanSegmentationSource()
 
     missing_branch_data = []
@@ -421,7 +423,7 @@ def run_missing_branch_test():
 
         pickle.dump(
             missing_branch_data,
-            open("results/missing_branch_data/{}.obj".format(skid), "wb"),
+            open("test_results/missing_branch_data/{}.obj".format(skid), "wb"),
         )
 
         done_skeles = pickle.load(done_skele_file.open("rb"))
