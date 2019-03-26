@@ -63,14 +63,14 @@ RunSimpleTest
 """
 
 
-def rank_from_map(sub_nid_com_map, key):
-    ranking = sorted(
-        [tuple([k, v[0], v[1]]) for k, v in sub_nid_com_map.items()], key=lambda x: x[2]
-    )
-    return [x[0] for x in ranking].index(key), len(ranking)
-
-
 def run_simple_test():
+    def rank_from_map(sub_nid_com_map, key):
+        ranking = sorted(
+            [tuple([k, v[0], v[1]]) for k, v in sub_nid_com_map.items()],
+            key=lambda x: x[2],
+        )
+        return [x[0] for x in ranking].index(key), len(ranking)
+
     jans_segmentations = JanSegmentationSource()
 
     save_file = Path("testing_data.obj")
@@ -181,25 +181,23 @@ RunFalseMergeTest
 """
 
 
-def rank_from_map(connectivity_map, location):
-    closest_pair = None
-    dist = None
-    for (nid, pid), ((n_center, p_center), score) in connectivity_map.items():
-        # calculate distance between line from n to p and the location we are looking for
-        d = np.linalg.norm(
-            np.cross(p_center - n_center, n_center - location)
-        ) / np.linalg.norm(p_center - n_center)
-        if closest_pair is None or d < dist:
-            closest_pair = (nid, pid)
-            dist = d
-
-    ranking = sorted(
-        [tuple([k, v[1]]) for k, v in connectivity_map.items()], key=lambda x: x[2]
-    )
-    return [x[0] for x in ranking].index(closest_pair), len(ranking)
-
-
 def run_false_merge_test():
+    def rank_from_map(connectivity_map, location):
+        closest_pair = None
+        dist = None
+        for (nid, pid), ((n_center, p_center), score) in connectivity_map.items():
+            # calculate distance between line from n to p and the location we are looking for
+            d = np.linalg.norm(
+                np.cross(p_center - n_center, n_center - location)
+            ) / np.linalg.norm(p_center - n_center)
+            if closest_pair is None or d < dist:
+                closest_pair = (nid, pid)
+                dist = d
+
+        ranking = sorted(
+            [tuple([k, v[1]]) for k, v in connectivity_map.items()], key=lambda x: x[2]
+        )
+        return [x[0] for x in ranking].index(closest_pair), len(ranking)
 
     logging.basicConfig(level=logging.INFO, filename="results/false_merges.log")
 
@@ -291,29 +289,26 @@ RunMissingBranchTest
 """
 
 
-def rank_from_map(sub_nid_com_map, key):
-    ranking = sorted(
-        [tuple([k, v[0], v[1]]) for k, v in sub_nid_com_map.items()], key=lambda x: x[2]
-    )
-    return [x[0] for x in ranking].index(key), len(ranking)
-
-
-def rank_from_location_map(sub_nid_com_map, branch_location):
-    closest = np.array([0, 0, 0])
-    for coord in sub_nid_com_map:
-        if np.linalg.norm(branch_location - coord) < np.linalg.norm(
-            branch_location - closest
-        ):
-            closest = coord
-    return rank_from_map(sub_nid_com_map, closest)
-
-
-def validate_chop(whole, chopped, chop):
-    remaining_nodes = [node.key for node in chopped.get_nodes()]
-    assert chop[0] in remaining_nodes and not chop[1] in remaining_nodes
-
-
 def run_missing_branch_test():
+    def rank_from_map(sub_nid_com_map, key):
+        ranking = sorted(
+            [tuple([k, v[0], v[1]]) for k, v in sub_nid_com_map.items()],
+            key=lambda x: x[2],
+        )
+        return [x[0] for x in ranking].index(key), len(ranking)
+
+    def rank_from_location_map(sub_nid_com_map, branch_location):
+        closest = np.array([0, 0, 0])
+        for coord in sub_nid_com_map:
+            if np.linalg.norm(branch_location - coord) < np.linalg.norm(
+                branch_location - closest
+            ):
+                closest = coord
+        return rank_from_map(sub_nid_com_map, closest)
+
+    def validate_chop(whole, chopped, chop):
+        remaining_nodes = [node.key for node in chopped.get_nodes()]
+        assert chop[0] in remaining_nodes and not chop[1] in remaining_nodes
 
     logging.basicConfig(level=logging.INFO, filename="results/missing_branches.log")
 
