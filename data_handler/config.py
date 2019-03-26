@@ -5,14 +5,8 @@ This module contains boilerplate configuration objects for storing and loading
 configuration state.
 """
 
-
-from __future__ import division
-
-import os
-
 import numpy as np
 import pytoml as toml
-import six
 
 
 class BaseConfig(object):
@@ -24,7 +18,7 @@ class BaseConfig(object):
 
     def __str__(self):
         sanitized = {}
-        for k, v in six.iteritems(self.__dict__):
+        for k, v in self.__dict__.items():
             if isinstance(v, np.ndarray):
                 sanitized[k] = v.tolist()
             else:
@@ -79,12 +73,12 @@ class Config(object):
 
     def __str__(self):
         sanitized = {}
-        for n, c in six.iteritems(self.__dict__):
+        for n, c in self.__dict__.items():
             if not isinstance(c, BaseConfig):
                 sanitized[n] = c
                 continue
             sanitized[n] = {}
-            for k, v in six.iteritems(c.__dict__):
+            for k, v in c.__dict__.items():
                 if isinstance(v, np.ndarray):
                     sanitized[n][k] = v.tolist()
                 else:
@@ -112,6 +106,3 @@ class Config(object):
     def to_toml(self, filename):
         with open(filename, "w") as tomlfile:
             tomlfile.write(str(self))
-
-
-CONFIG = Config()
