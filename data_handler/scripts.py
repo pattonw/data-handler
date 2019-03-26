@@ -32,7 +32,7 @@ def query_jans_segmentation(config, output_file_base):
         )
     if config.skeleton.resample:
         processed_skel = skel.resample_segments(
-            config.skeleton.resample_delta, 1000, 0.1
+            config.skeleton.resample_delta, 1000, 0.000001
         )
     else:
         processed_skel = skel
