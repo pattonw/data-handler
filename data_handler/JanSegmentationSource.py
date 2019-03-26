@@ -63,14 +63,7 @@ class JanSegmentationSource:
 
     @property
     def translation_phys(self):
-        """
-        Data translation between input coordinates (from CATMAID) to
-        segmentation coordinates
-
-        There is a one slice difference between catmaid and the fafb_v14 n5 volume
-        used by the futusa group
-        """
-        return self.constants.get("translation", np.array([0, 0, -40]))
+        return self.volume.translation_phys
 
     @property
     def start(self) -> np.ndarray:
@@ -105,7 +98,7 @@ class JanSegmentationSource:
         """
         Shape of a field of view around each node during segmentation in X,Y,Z order
         """
-        shape = self.constants.get("fov_voxel_shape", np.array([31, 31, 31]))
+        shape = self.constants.get("fov_shape_voxels", np.array([31, 31, 31]))
         if any(shape % 2 == np.array([0, 0, 0])):
             raise ValueError(
                 "Even fov_shapes are not supported yet since ",
