@@ -19,7 +19,7 @@ def query_jans_segmentation(config, output_file_base):
         "shape_phys": np.array([253952 * 4, 155648 * 4, 7063 * 40]),
         "downsample_scale": np.array([10, 10, 1]),
         "leaf_voxel_shape": np.array([128, 128, 128]),
-        "fov_shape_voxels": np.array([45, 45, 45]),
+        "fov_voxel_shape": np.array([45, 45, 45]),
     }
     skel.seg._constants = constants
 
