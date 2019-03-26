@@ -9,7 +9,7 @@ from pathlib import Path
 from sarbor import OctreeVolume
 
 
-def query_jans_segmentation(config):
+def query_jans_segmentation(config, output_file_base):
     logging.basicConfig(level=logging.INFO)
 
     skel = Skeleton()
