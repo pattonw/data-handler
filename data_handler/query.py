@@ -25,21 +25,21 @@ def query_jans_segmentation(config, output_file):
 
 
 @cli.command()
-def run_simple_test(config, output_file):
+def run_simple_test():
     from .scripts import run_simple_test
 
     run_simple_test()
 
 
 @cli.command()
-def run_missing_branches(config, output_file):
+def run_missing_branches():
     from .scripts import run_missing_branch_test
 
     run_missing_branch_test()
 
 
 @cli.command()
-def run_false_merges(config, output_file):
+def run_false_merges():
     from .scripts import run_false_merge_test
 
     run_false_merge_test()
