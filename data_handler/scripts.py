@@ -312,11 +312,20 @@ def run_missing_branch_test():
         remaining_nodes = [node.key for node in chopped.get_nodes()]
         assert chop[0] in remaining_nodes and not chop[1] in remaining_nodes
 
-    logging.basicConfig(level=logging.INFO, filename="test_results/missing_branches.log")
+    logging.basicConfig(
+        level=logging.INFO, filename="test_results/missing_branches.log"
+    )
 
+    # create a file to keep track of which skeletons have been segmented
     done_skele_file = Path("test_results/done_skeles_dict.obj")
+    if not done_skele_file.is_file():
+        with done_skele_file.open("wb") as f:
+            pickle.dump({}, f)
+
     jans_segmentations = JanSegmentationSource()
 
+    # Data is stored per skeleton we analyze, this way the file
+    # doesn't get so large it becomes a bottle neck
     missing_branch_data = []
     for (
         skid,
@@ -326,13 +335,12 @@ def run_missing_branch_test():
         chop,
         new_skeleton,
     ) in jans_segmentations.missing_branches:
+        # If this is a new skeleton, remove any old cache
         if new_skeleton:
             missing_branch_data = []
             jans_segmentations._node_segmentations = {}
-        if not done_skele_file.is_file():
-            with done_skele_file.open("wb") as f:
-                pickle.dump({}, f)
 
+        # Check if this skeleton has been done before
         with done_skele_file.open("rb") as f:
             done_skeles = pickle.load(f)
             if done_skeles.get((skid, chop_type, chop[0], chop[1]), False):
@@ -344,6 +352,7 @@ def run_missing_branch_test():
                 continue
             logging.info("segmenting skeleton {} with chop {}!".format(skid, chop))
 
+        # Downsample tree to only contain nodes in the Calyx
         unsampled_tree = chopped_skeleton
         try:
             num_filtered = unsampled_tree.filter_nodes_by_bounds(
@@ -357,18 +366,35 @@ def run_missing_branch_test():
             logging.debug(e)
             continue
         logging.info("{} nodes filtered out of skeleton {}!".format(num_filtered, skid))
+
+        # Check if the branch node was filtered out of the skeleton,
+        # i.e. it was not in the calyx
         try:
             validate_chop(whole_skeleton, chopped_skeleton, chop)
-            filtered_out = False
         except AssertionError:
-            logging.warn("branch location filtered out of Tree")
-            filtered_out = True
+            # go to next skeleton
+            continue
 
+        # resample tree
         sampled_tree = unsampled_tree.resample_segments(900, 1000, 0.01)
-        jans_segmentations.segment_skeleton(sampled_tree, 64)
 
+        # set jans_segmentation fov_shape_voxels
+        constants = {
+            "original_resolution": np.array([4, 4, 40]),
+            "start_phys": np.array([0, 0, 0]),
+            "shape_phys": np.array([253952 * 4, 155648 * 4, 7063 * 40]),
+            "downsample_scale": np.array([10, 10, 1]),
+            "leaf_voxel_shape": np.array([128, 128, 128]),
+            "fov_voxel_shape": np.array([45, 45, 45]),
+        }
+        jans_segmentations.constants["fov_shape_voxels"] = np.array([45, 45, 45])
+        sampled_tree.seg._constants = constants
+
+        # segment the tree
+        jans_segmentations.segment_skeleton(sampled_tree, 64)
         logging.debug("Segmentation done!")
 
+        # retrieve segmentations associated with each seed point and insert them into the sarbor
         for node in sampled_tree.get_nodes():
             try:
                 data, bounds = jans_segmentations[tuple(node.value.center)]
@@ -377,36 +403,44 @@ def run_missing_branch_test():
                 logging.debug("No data for node {}!".format(node.key))
             except TypeError:
                 logging.debug("Node {} data was None".format(node.value.center))
-
         logging.debug("Segmentation stored in nodes")
 
-        sampled_tree.fov_shape = jans_segmentations.fov_shape
-        sampled_tree.resolution = jans_segmentations.fov_shape
+        # create octrees from stored segmentation
         sampled_tree.seg.create_octrees_from_nodes(sampled_tree.get_nodes())
         logging.debug("Octrees created")
+
+        # get branch node scores by location
         location_score_map = sampled_tree.get_nid_branch_score_map(key="location")
+
+        # get branch node scores by nid
         nid_score_map = {
             node.key: location_score_map[tuple(node.value.center)]
             for node in sampled_tree.get_nodes()
         }
+
+        # smooth branch node scores
         smoothed_scores = sampled_tree._smooth_scores(nid_score_map)
         smoothed_location_score_map = {
             tuple(node.value.center): smoothed_scores[node.key]
             for node in sampled_tree.get_nodes()
         }
         logging.debug("Scoring done")
+
+        # get unsmoothed rank
         rank_unsmoothed = rank_from_location_map(
             location_score_map, whole_skeleton.nodes[chop[0]].value.center
         )
+        # get smoothed rank
         rank_smoothed = rank_from_location_map(
             smoothed_location_score_map, whole_skeleton.nodes[chop[0]].value.center
         )
-        logging.warn(
+        logging.info(
             "Missing branch node {} on skeleton {} found with smoothed rank {} vs unsmoothed {}".format(
                 chop[1], skid, rank_smoothed, rank_unsmoothed
             )
         )
 
+        # save data
         missing_branch_data.append(
             (
                 skid,
@@ -417,7 +451,6 @@ def run_missing_branch_test():
                 location_score_map,
                 smoothed_location_score_map,
                 whole_skeleton.extract_data(),
-                filtered_out,
             )
         )
 
