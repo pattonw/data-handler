@@ -507,7 +507,7 @@ class SkeletonFetcher:
     def build_missing_branch_dataset(
         self,
         num_skeletons: int = 100,
-        num_branch_chops: int = 10,
+        num_branch_chops: int = 100,
         num_segment_chops: int = 5,
     ):
         """

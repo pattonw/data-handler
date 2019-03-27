@@ -406,7 +406,9 @@ def run_missing_branch_test():
         logging.debug("Segmentation stored in nodes")
 
         # create octrees from stored segmentation
-        sampled_tree.seg.create_octrees_from_nodes(sampled_tree.get_nodes())
+        sampled_tree.seg.create_octrees_from_nodes(
+            sampled_tree.get_nodes(), interpolate_dist_nodes=3
+        )
         logging.debug("Octrees created")
 
         # get branch node scores by location

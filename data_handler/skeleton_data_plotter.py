@@ -41,8 +41,8 @@ def load_data():
             )
     return data
 
-def run():
 
+def run():
     data = pd.DataFrame(
         load_data(),
         columns=[
