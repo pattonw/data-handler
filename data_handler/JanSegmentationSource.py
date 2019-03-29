@@ -393,7 +393,12 @@ class JanSegmentationSource:
         while done_fetchers.value < num_processes or not results_queue.empty():
             try:
                 node, data, bounds = results_queue.get(True, 5)
-                self[node] = (data, bounds)
+                try:
+                    self[node] = (data, bounds)
+                except ValueError:
+                    logging.warning(
+                        "Trying to override segmentation data on node {}!".format(node)
+                    )
                 num_done += 1
                 if num_done % 50 == 0:
                     logging.info(
