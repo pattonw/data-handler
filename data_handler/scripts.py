@@ -201,9 +201,9 @@ def run_false_merge_test():
         )
         return [x[0] for x in ranking].index(closest_pair), len(ranking)
 
-    logging.basicConfig(level=logging.INFO, filename="results/false_merges.log")
+    logging.basicConfig(level=logging.INFO, filename="test_results/false_merges.log")
 
-    done_skele_file = Path("results/done_false_merge_dict.obj")
+    done_skele_file = Path("test_results/done_false_merge_dict.obj")
     jans_segmentations = JanSegmentationSource()
 
     false_merge_data = []
@@ -280,7 +280,7 @@ def run_false_merge_test():
         false_merge_data.append((skid, log, skeleton.extract_data(), score_map, rank))
 
         pickle.dump(
-            false_merge_data, open("results/false_merge_data/{}.obj".format(skid), "wb")
+            false_merge_data, open("test_results/false_merge_data/{}.obj".format(skid), "wb")
         )
 
         done_skeles = pickle.load(done_skele_file.open("rb"))
