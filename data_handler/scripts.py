@@ -636,8 +636,8 @@ def run_connectivity_stats():
                 len(connected_node_scores),
                 sum(connected_node_scores) / (len(connected_node_scores) + 1),
                 len(disconnected_node_scores),
-                sum(disconnected_node_scores) / (len(disconnected_node_scores) + 1),
                 k,
+                sum(disconnected_node_scores) / (len(disconnected_node_scores) + 1),
             )
         )
 
@@ -648,7 +648,7 @@ def run_connectivity_stats():
 
         pickle.dump(
             missing_branch_data,
-            open("test_results/missing_branch_data/{}.obj".format(skid), "wb"),
+            open("test_results/merge_stats_data/{}.obj".format(skid), "wb"),
         )
 
         done_skeles = pickle.load(done_skele_file.open("rb"))
