@@ -564,6 +564,7 @@ def run_connectivity_stats():
         sampled_tree = unsampled_tree.resample_segments(500, 1000, 0.01)
 
         n = len(sampled_tree.nodes)
+        k = 0
         for i in range(n, n + 10):
             s = random.choice(range(n))
             start = sampled_tree.nodes[s]
@@ -573,8 +574,10 @@ def run_connectivity_stats():
                 center = (parent.value.center + start.value.center) // 2
                 perp_vec = np.cross(vector, [1, 0, 0])
                 perp_vec = perp_vec / np.linalg.norm(perp_vec) * 500
-                new_node = Node(key=s, center=center + perp_vec)
+                new_node = Node(key=i, center=center + perp_vec)
                 start.add_child(new_node)
+                sampled_tree.nodes[i] = new_node
+                k += 1
 
         # set jans_segmentation fov_shape_voxels
         constants = {
@@ -617,18 +620,20 @@ def run_connectivity_stats():
         disconnected_node_scores = [
             v[1] for k, v in connectivity_scores.items() if k[0] >= n
         ]
+
         logging.info(
-            "connected_node_scores: #{} -> {}\nrandom_node_scores: #{} -> {}".format(
+            "connected_node_scores: #{} -> {}\nrandom_node_scores: #{}({}) -> {}".format(
                 len(connected_node_scores),
                 sum(connected_node_scores) / (len(connected_node_scores) + 1),
                 len(disconnected_node_scores),
                 sum(disconnected_node_scores) / (len(disconnected_node_scores) + 1),
+                k,
             )
         )
 
         # save data
         missing_branch_data.append(
-            (skid, whole_skeleton.extract_data(), connectivity_scores), n
+            (skid, whole_skeleton.extract_data(), connectivity_scores, n)
         )
 
         pickle.dump(
