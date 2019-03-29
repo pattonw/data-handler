@@ -612,9 +612,9 @@ def run_connectivity_stats():
         # get connectivity scores
         connectivity_scores = sampled_tree.get_node_connectivity()
         connected_node_scores = [
-            v[1] for k, v in connectivity_scores if k[0] in range(n)
+            v[1] for k, v in connectivity_scores.items() if k[0] in range(n)
         ]
-        disconnected_node_scores = [v[1] for k, v in connectivity_scores if k[0] >= n]
+        disconnected_node_scores = [v[1] for k, v in connectivity_scores.items() if k[0] >= n]
         logging.info(
             "connected_node_scores: {}\nrandom_node_scores: {}".format(
                 sum(connected_node_scores) / len(connected_node_scores),
