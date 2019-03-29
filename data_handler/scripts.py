@@ -574,10 +574,20 @@ def run_connectivity_stats():
                 center = (parent.value.center + start.value.center) // 2
                 perp_vec = np.cross(vector, [1, 0, 0])
                 perp_vec = perp_vec / np.linalg.norm(perp_vec) * 500
-                new_node = Node(key=i, center=center + perp_vec)
-                start.add_child(new_node)
-                sampled_tree.nodes[i] = new_node
-                k += 1
+                if jans_segmentations.bounding_box.contains_point_with_radius(
+                    perp_vec + center, jans_segmentations.fov_shape // 2
+                ):
+                    new_node = Node(key=i, center=center + perp_vec)
+                    start.add_child(new_node)
+                    sampled_tree.nodes[i] = new_node
+                    k += 1
+                elif jans_segmentations.bounding_box.contains_point_with_radius(
+                    -perp_vec + center, jans_segmentations.fov_shape // 2
+                ):
+                    new_node = Node(key=i, center=center - perp_vec)
+                    start.add_child(new_node)
+                    sampled_tree.nodes[i] = new_node
+                    k += 1
 
         # set jans_segmentation fov_shape_voxels
         constants = {
