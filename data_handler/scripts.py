@@ -573,7 +573,7 @@ def run_connectivity_stats():
                 center = (parent.value.center + start.value.center) // 2
                 perp_vec = np.cross(vector, [1, 0, 0])
                 perp_vec = perp_vec / np.linalg.norm(perp_vec) * 500
-                new_node = Node({"key": s, "center": center + perp_vec})
+                new_node = Node(key=s, center=center + perp_vec)
                 start.add_child(new_node)
 
         # set jans_segmentation fov_shape_voxels
