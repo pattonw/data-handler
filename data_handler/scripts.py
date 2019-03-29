@@ -1,12 +1,12 @@
-import sys
 from data_handler.JanSegmentationSource import JanSegmentationSource
 from sarbor import Skeleton
+from sarbor.arbors import Node
 import numpy as np
 import logging
-import json
 import pickle
 from pathlib import Path
 from sarbor import OctreeVolume
+import random
 
 
 def query_jans_segmentation(config, output_file_base):
@@ -478,4 +478,160 @@ def run_missing_branch_test():
 
         done_skeles = pickle.load(done_skele_file.open("rb"))
         done_skeles[(skid, chop_type, chop[0], chop[1])] = True
+        pickle.dump(done_skeles, done_skele_file.open("wb"))
+
+
+"""
+Connectivity_Stats
+"""
+
+
+def run_connectivity_stats():
+    def rank_from_map(sub_nid_com_map, key):
+        ranking = sorted(
+            [tuple([k, v[0], v[1]]) for k, v in sub_nid_com_map.items()],
+            key=lambda x: x[2],
+        )
+        return [x[0] for x in ranking].index(key), len(ranking)
+
+    def rank_from_location_map(sub_nid_com_map, branch_location):
+        closest = np.array([0, 0, 0])
+        for coord in sub_nid_com_map:
+            if np.linalg.norm(branch_location - coord) < np.linalg.norm(
+                branch_location - closest
+            ):
+                closest = coord
+        return rank_from_map(sub_nid_com_map, closest)
+
+    def validate_chop(whole, chopped, chop):
+        remaining_nodes = [node.key for node in chopped.get_nodes()]
+        assert chop[0] in remaining_nodes and not chop[1] in remaining_nodes
+
+    logging.basicConfig(
+        level=logging.INFO, filename="test_results/connectivity_stats.log"
+    )
+
+    # create a file to keep track of which skeletons have been segmented
+    done_skele_file = Path("test_results/done_stats_dict.obj")
+    if not done_skele_file.is_file():
+        with done_skele_file.open("wb") as f:
+            pickle.dump({}, f)
+
+    jans_segmentations = JanSegmentationSource()
+
+    # Data is stored per skeleton we analyze, this way the file
+    # doesn't get so large it becomes a bottle neck
+    missing_branch_data = []
+    for (
+        skid,
+        whole_skeleton,
+        chopped_skeleton,
+        chop_type,
+        chop,
+        new_skeleton,
+    ) in jans_segmentations.missing_branches:
+        # If this is a new skeleton, remove any old cache
+        if new_skeleton:
+            missing_branch_data = []
+            jans_segmentations._node_segmentations = {}
+        else:
+            continue
+
+        # Check if this skeleton has been done before
+        with done_skele_file.open("rb") as f:
+            done_skeles = pickle.load(f)
+            if done_skeles.get(skid, False):
+                logging.info("skeleton {} has already been segmented!".format(skid))
+                continue
+            logging.info("segmenting skeleton {}!".format(skid))
+
+        # Downsample tree to only contain nodes in the Calyx
+        unsampled_tree = whole_skeleton
+        try:
+            num_filtered = unsampled_tree.filter_nodes_by_bounds(
+                (
+                    jans_segmentations.start + jans_segmentations.fov_shape // 2,
+                    jans_segmentations.end - jans_segmentations.fov_shape // 2 - 1,
+                )
+            )
+        except ValueError as e:
+            logging.warn("All nodes filtered out!")
+            logging.debug(e)
+            continue
+        logging.info("{} nodes filtered out of skeleton {}!".format(num_filtered, skid))
+
+        # resample tree
+        sampled_tree = unsampled_tree.resample_segments(500, 1000, 0.01)
+
+        n = len(sampled_tree.nodes)
+        for i in range(n, n + 10):
+            s = random.choice(range(n))
+            start = sampled_tree.nodes[s]
+            parent = sampled_tree.nodes[s].parent
+            if parent is not None:
+                vector = parent.value.center - start.value.center
+                center = (parent.value.center + start.value.center) // 2
+                perp_vec = np.cross(vector, [1, 0, 0])
+                perp_vec = perp_vec / np.linalg.norm(perp_vec) * 500
+                new_node = Node({"key": s, "center": center + perp_vec})
+                start.add_child(new_node)
+
+        # set jans_segmentation fov_shape_voxels
+        constants = {
+            "original_resolution": np.array([4, 4, 40]),
+            "start_phys": np.array([0, 0, 0]),
+            "shape_phys": np.array([253952 * 4, 155648 * 4, 7063 * 40]),
+            "downsample_scale": np.array([10, 10, 1]),
+            "leaf_voxel_shape": np.array([128, 128, 128]),
+            "fov_voxel_shape": np.array([45, 45, 45]),
+        }
+        jans_segmentations.constants["fov_shape_voxels"] = np.array([45, 45, 45])
+        sampled_tree.seg._constants = constants
+
+        # segment the tree
+        jans_segmentations.segment_skeleton(sampled_tree, 64)
+        logging.debug("Segmentation done!")
+
+        # retrieve segmentations associated with each seed point and insert them into the sarbor
+        for node in sampled_tree.get_nodes():
+            try:
+                data, bounds = jans_segmentations[tuple(node.value.center)]
+                node.value.mask = (data >= 177).astype(np.uint8)
+            except KeyError:
+                logging.debug("No data for node {}!".format(node.key))
+            except TypeError:
+                logging.debug("Node {} data was None".format(node.value.center))
+        logging.debug("Segmentation stored in nodes")
+
+        # create octrees from stored segmentation
+        sampled_tree.seg.create_octrees_from_nodes(
+            sampled_tree.get_nodes(), interpolate_dist_nodes=3
+        )
+        logging.debug("Octrees created")
+
+        # get connectivity scores
+        connectivity_scores = sampled_tree.get_node_connectivity()
+        connected_node_scores = [
+            v[1] for k, v in connectivity_scores if k[0] in range(n)
+        ]
+        disconnected_node_scores = [v[1] for k, v in connectivity_scores if k[0] >= n]
+        logging.info(
+            "connected_node_scores: {}\nrandom_node_scores: {}".format(
+                sum(connected_node_scores) / len(connected_node_scores),
+                sum(disconnected_node_scores) / len(disconnected_node_scores),
+            )
+        )
+
+        # save data
+        missing_branch_data.append(
+            (skid, whole_skeleton.extract_data(), connectivity_scores), n
+        )
+
+        pickle.dump(
+            missing_branch_data,
+            open("test_results/missing_branch_data/{}.obj".format(skid), "wb"),
+        )
+
+        done_skeles = pickle.load(done_skele_file.open("rb"))
+        done_skeles[skid] = True
         pickle.dump(done_skeles, done_skele_file.open("wb"))

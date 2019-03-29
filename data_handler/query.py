@@ -43,3 +43,9 @@ def run_false_merges():
     from .scripts import run_false_merge_test
 
     run_false_merge_test()
+
+@cli.command()
+def run_merge_stats():
+    from .scripts import run_connectivity_stats
+
+    run_connectivity_stats()
