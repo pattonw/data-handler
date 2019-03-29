@@ -197,7 +197,7 @@ def run_false_merge_test():
                 dist = d
 
         ranking = sorted(
-            [tuple([k, v[1]]) for k, v in connectivity_map.items()], key=lambda x: x[2]
+            [tuple([k, v[1]]) for k, v in connectivity_map.items()], key=lambda x: x[1]
         )
         return [x[0] for x in ranking].index(closest_pair), len(ranking)
 
