@@ -240,11 +240,23 @@ def run_false_merge_test():
 
         split_location = np.array(log[3:6])
 
-        # --------Segmentation--------
         # Sample node points from skeleton
-        # gather segmentations
+        try:
+            sampled_tree = unsampled_tree.resample_segments(900, 1000, 0.01)
+        except ValueError as e:
+            continue
 
-        sampled_tree = unsampled_tree.resample_segments(900, 1000, 0.01)
+        # set jans_segmentation fov_shape_voxels
+        constants = {
+            "original_resolution": np.array([4, 4, 40]),
+            "start_phys": np.array([0, 0, 0]),
+            "shape_phys": np.array([253952 * 4, 155648 * 4, 7063 * 40]),
+            "downsample_scale": np.array([10, 10, 1]),
+            "leaf_voxel_shape": np.array([128, 128, 128]),
+            "fov_voxel_shape": np.array([45, 45, 45]),
+        }
+        jans_segmentations.constants["fov_shape_voxels"] = np.array([45, 45, 45])
+        sampled_tree.seg._constants = constants
 
         jans_segmentations.segment_skeleton(sampled_tree, 64)
 
@@ -280,7 +292,8 @@ def run_false_merge_test():
         false_merge_data.append((skid, log, skeleton.extract_data(), score_map, rank))
 
         pickle.dump(
-            false_merge_data, open("test_results/false_merge_data/{}.obj".format(skid), "wb")
+            false_merge_data,
+            open("test_results/false_merge_data/{}.obj".format(skid), "wb"),
         )
 
         done_skeles = pickle.load(done_skele_file.open("rb"))
