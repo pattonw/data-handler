@@ -222,6 +222,8 @@ def run_false_merge_test():
                 continue
             logging.info("Running split: {}!".format(log))
 
+        skeleton.calculate_strahlers()
+
         unsampled_tree = skeleton
         try:
             num_filtered = unsampled_tree.filter_nodes_by_bounds(
@@ -275,7 +277,7 @@ def run_false_merge_test():
             "False merge at location {} found at rank {}".format(split_location, rank)
         )
 
-        false_merge_data.append((skid, log, skeleton.extract_data(), score_map))
+        false_merge_data.append((skid, log, skeleton.extract_data(), score_map, rank))
 
         pickle.dump(
             false_merge_data, open("results/false_merge_data/{}.obj".format(skid), "wb")
