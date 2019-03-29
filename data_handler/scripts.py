@@ -614,11 +614,15 @@ def run_connectivity_stats():
         connected_node_scores = [
             v[1] for k, v in connectivity_scores.items() if k[0] in range(n)
         ]
-        disconnected_node_scores = [v[1] for k, v in connectivity_scores.items() if k[0] >= n]
+        disconnected_node_scores = [
+            v[1] for k, v in connectivity_scores.items() if k[0] >= n
+        ]
         logging.info(
-            "connected_node_scores: {}\nrandom_node_scores: {}".format(
-                sum(connected_node_scores) / len(connected_node_scores),
-                sum(disconnected_node_scores) / len(disconnected_node_scores),
+            "connected_node_scores: #{} -> {}\nrandom_node_scores: #{} -> {}".format(
+                len(connected_node_scores),
+                sum(connected_node_scores) / (len(connected_node_scores) + 1),
+                len(disconnected_node_scores),
+                sum(disconnected_node_scores) / (len(disconnected_node_scores) + 1),
             )
         )
 
